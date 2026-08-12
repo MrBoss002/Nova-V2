@@ -1,13 +1,13 @@
 import asyncio
 import logging
-import os
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from threading import Thread
 
 from aiogram import Bot, Dispatcher
-from aiogram.enums import ParseMode
 from config import BOT_TOKEN, PORT
-from handlers import start
+
+# Import all handler routers
+from handlers import start, admin, media, chat
 
 # Enable Logging
 logging.basicConfig(level=logging.INFO)
@@ -33,10 +33,19 @@ async def main():
     bot = Bot(token=BOT_TOKEN)
     dp = Dispatcher()
 
-    # Register Handlers
+    # -------------------------------------------------------------
+    # ROUTER REGISTRATION ORDER IS CRITICAL:
+    # 1. start.router  -> Handles /start, /help, & menu buttons
+    # 2. admin.router  -> Handles /stats & media reply /broadcast
+    # 3. media.router  -> Handles incoming Photos & Voice Notes
+    # 4. chat.router   -> Catch-all for AI conversational text (MUST BE LAST)
+    # -------------------------------------------------------------
     dp.include_router(start.router)
+    dp.include_router(admin.router)
+    dp.include_router(media.router)
+    dp.include_router(chat.router)
 
-    # Start Health Check Server in Background Thread
+    # Start Health Check Server in Background Thread for web hosting
     Thread(target=run_health_check_server, daemon=True).start()
 
     logging.info("Starting Nova-V2 Bot Polling...")
