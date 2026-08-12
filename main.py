@@ -1,10 +1,12 @@
 import asyncio
 import logging
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from threading import Thread
+from aiohttp import web
 
 from aiogram import Bot, Dispatcher
 from config import BOT_TOKEN, PORT
+
+# Import database initializer
+from services.database import init_db
 
 # Import all handler routers
 from handlers import start, admin, media, chat
@@ -12,24 +14,27 @@ from handlers import start, admin, media, chat
 # Enable Logging
 logging.basicConfig(level=logging.INFO)
 
-# Web Server for Cloud Health Checks (Render / Railway)
-class HealthCheckHandler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        self.send_response(200)
-        self.end_headers()
-        self.wfile.write(b"Nova-V2 is live and healthy!")
+# Async Web Server for Cloud Health Checks (Render / Railway)
+async def handle_health_check(request):
+    return web.Response(text="Nova-V2 is live and healthy!", status=200)
 
-def run_health_check_server():
-    server_address = ('', PORT)
-    httpd = HTTPServer(server_address, HealthCheckHandler)
+async def start_health_check_server():
+    app = web.Application()
+    app.router.add_get("/", handle_health_check)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, "0.0.0.0", PORT)
+    await site.start()
     logging.info(f"Health check server running on port {PORT}")
-    httpd.serve_forever()
 
 async def main():
     if not BOT_TOKEN or BOT_TOKEN == "YOUR_TELEGRAM_BOT_TOKEN":
         raise ValueError("BOT_TOKEN is missing! Please set it in config.py or .env file.")
 
-    # Initialize Bot and Dispatcher
+    # 1. Initialize SQLite Database
+    init_db()
+
+    # 2. Initialize Bot and Dispatcher
     bot = Bot(token=BOT_TOKEN)
     dp = Dispatcher()
 
@@ -45,8 +50,8 @@ async def main():
     dp.include_router(media.router)
     dp.include_router(chat.router)
 
-    # Start Health Check Server in Background Thread for web hosting
-    Thread(target=run_health_check_server, daemon=True).start()
+    # 3. Start Async Health Check Server for Web Hosting
+    await start_health_check_server()
 
     logging.info("Starting Nova-V2 Bot Polling...")
     await dp.start_polling(bot)
