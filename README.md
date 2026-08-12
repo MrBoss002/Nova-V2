@@ -1,5 +1,11 @@
 # 🚀 Nova-V2 — Intelligent Telegram AI Assistant & Business Hub
 
+[![GitHub Stars](https://img.shields.io/github/stars/MrBoss002/Nova-V2?style=for-the-badge&color=gold)](https://github.com/MrBoss002/Nova-V2/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/MrBoss002/Nova-V2?style=for-the-badge&color=blue)](https://github.com/MrBoss002/Nova-V2/network/members)
+[![GitHub Issues](https://img.shields.io/github/issues/MrBoss002/Nova-V2?style=for-the-badge&color=red)](https://github.com/MrBoss002/Nova-V2/issues)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+[![Python Version](https://img.shields.io/badge/Python-3.10%2B-brightgreen?style=for-the-badge&logo=python)](https://www.python.org/)
+
 Nova-V2 is a feature-rich, asynchronous Telegram bot built with aiogram 3, Google Gemini AI, and SQLite. Engineered for channel managers, content creators, and e-commerce founders, Nova-V2 seamlessly handles multimodal AI chat, native Markdown post formatting, voice note transcriptions, media broadcasting, and database user tracking.
 
 ---
