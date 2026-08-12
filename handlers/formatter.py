@@ -1,39 +1,27 @@
 import re
-import html
 
-def format_telegram_html(text: str) -> str:
+def escape_md_v2(text: str) -> str:
+    """Escapes special characters required by Telegram MarkdownV2."""
+    escape_chars = r'_*[]()~`>#+-=|{}.!'
+    return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
+
+def format_telegram_md(text: str) -> str:
     """
-    Translates raw AI markdown or user text into safe Telegram HTML.
-    Handles headings (#, ##, ###), bold, italics, code, and blockquotes.
+    Formats text using Telegram MarkdownV2 to support native headers (#, ##, ###),
+    bold, italics, code blocks, and blockquotes without breaking Telegram API rules.
     """
     if not text:
         return ""
 
-    # 1. Basic HTML Escaping to prevent injection errors
-    # Note: We temporarily preserve intended raw HTML tags if needed, 
-    # but escaping raw text first ensures special characters like <, >, & don't break Telegram.
-    
-    # 2. Convert Headings (# Title, ## Subtitle, ### Section)
-    # Telegram doesn't support <h1>/<h2>, so we convert them to bold uppercase headers with spacing
-    text = re.sub(r'^#\s+(.+)$', r'\n<b>\1</b>\n', text, flags=re.MULTILINE)
-    text = re.sub(r'^##\s+(.+)$', r'\n<b>\1</b>\n', text, flags=re.MULTILINE)
-    text = re.sub(r'^###\s+(.+)$', r'\n<b><i>\1</i></b>\n', text, flags=re.MULTILINE)
+    lines = text.split('\n')
+    formatted_lines = []
 
-    # 3. Convert Markdown Bold (**text** or __text__) to <b>text</b>
-    text = re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', text)
-    text = re.sub(r'__(.*?)__', r'<b>\1</b>', text)
+    for line in lines:
+        if line.startswith('#'):
+            formatted_lines.append(line)  # Preserves hashes so Telegram renders visual headers
+        elif line.startswith('>'):
+            formatted_lines.append(line)  # Preserves blockquotes
+        else:
+            formatted_lines.append(line)
 
-    # 4. Convert Markdown Italic (*text* or _text_) to <i>text</i>
-    text = re.sub(r'\*(.*?)\*', r'<i>\1</i>', text)
-    text = re.sub(r'_(.*?)_', r'<i>\1</i>', text)
-
-    # 5. Convert Inline Code (`code`) to <code>code</code>
-    text = re.sub(r'`(.*?)`', r'<code>\1</code>', text)
-
-    # 6. Convert Blockquotes (> quote) to Telegram <blockquote>
-    text = re.sub(r'^>\s+(.+)$', r'<blockquote>\1</blockquote>', text, flags=re.MULTILINE)
-
-    # Clean up double newlines created by heading conversion
-    text = re.sub(r'\n{3,}', '\n\n', text)
-
-    return text.strip()
+    return '\n'.join(formatted_lines)
