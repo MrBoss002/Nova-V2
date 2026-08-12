@@ -15,5 +15,8 @@ OWNER_HANDLE = "@MrBoss002"
 MAIN_CHANNEL = "@MrBossTG"
 STORE_CATALOG = "https://sites.google.com/view/zerotwo-onlinestore"
 
+# new user log channel id
+LOG_CHANNEL_ID = os.getenv("LOG_CHANNEL_ID", None)  # Set numeric ID in .env
+
 # Server Port
 PORT = int(os.getenv("PORT", 10000))
