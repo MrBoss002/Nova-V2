@@ -1,11 +1,11 @@
 import asyncio
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from config import GEMINI_API_KEY, OWNER_HANDLE, MAIN_CHANNEL
 
-# Configure API Key
-genai.configure(api_key=GEMINI_API_KEY)
+# Initialize the new Google GenAI client
+client = genai.Client(api_key=GEMINI_API_KEY)
 
-# Default System Instruction
 SYSTEM_PROMPT = f"""
 You are Nova, an all-in-one AI Companion, Content Assistant, and Business Strategist.
 You are direct, witty, creative, and highly adaptive.
@@ -28,44 +28,30 @@ KEY INSTRUCTIONS:
    - Use headings (# for main titles, ## for sections) and bold text generously to keep posts readable.
 """
 
-# Initialize Gemini Model with gemini-2.5-flash
-model = genai.GenerativeModel(
-    model_name="gemini-2.5-flash",
-    system_instruction=SYSTEM_PROMPT
-)
-
 async def generate_response(prompt: str, image_bytes: bytes = None) -> str:
-    """Generates text or multimodal responses using Gemini asynchronously."""
+    """Generates responses using the updated google-genai SDK."""
     try:
+        config = types.GenerateContentConfig(
+            system_instruction=SYSTEM_PROMPT
+        )
+
         if image_bytes:
             contents = [
-                {
-                    "mime_type": "image/jpeg",
-                    "data": image_bytes
-                },
+                types.Part.from_bytes(data=image_bytes, mime_type="image/jpeg"),
                 prompt
             ]
-            # Run blocking API call in background thread
-            response = await asyncio.to_thread(model.generate_content, contents)
         else:
-            response = await asyncio.to_thread(model.generate_content, prompt)
-            
+            contents = prompt
+
+        # Offload blocking request to background thread
+        response = await asyncio.to_thread(
+            client.models.generate_content,
+            model="gemini-2.5-flash",
+            contents=contents,
+            config=config
+        )
+
         return response.text
+
     except Exception as e:
-        # Fallback check if 2.5-flash is unavailable on legacy SDK
-        if "404" in str(e):
-            try:
-                fallback_model = genai.GenerativeModel(
-                    model_name="gemini-1.5-flash",
-                    system_instruction=SYSTEM_PROMPT
-                )
-                if image_bytes:
-                    contents = [{"mime_type": "image/jpeg", "data": image_bytes}, prompt]
-                    res = await asyncio.to_thread(fallback_model.generate_content, contents)
-                else:
-                    res = await asyncio.to_thread(fallback_model.generate_content, prompt)
-                return res.text
-            except Exception as fallback_err:
-                return f"An error occurred while connecting to my AI core: {str(fallback_err)}"
-                
         return f"An error occurred while connecting to my AI core: {str(e)}"
