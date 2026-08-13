@@ -22,27 +22,6 @@ Nova-V2 is a feature-rich, asynchronous Telegram bot built with aiogram 3, Googl
 
 ---
 
-## 📁 Repository Structure
-
-Nova-V2/
-├── handlers/
-│   ├── __init__.py      # Package exports for aiogram handlers
-│   ├── start.py         # /start menu, persona selection & log channel routing
-│   ├── admin.py         # /stats metrics & media reply /broadcast
-│   ├── media.py         # Gemini photo/vision & voice note audio handling
-│   ├── chat.py          # Dynamic AI conversational text routing & owner responses
-│   └── formatter.py     # Native Telegram MarkdownV2 heading & string escape logic
-├── services/
-│   ├── __init__.py      # Package exports for internal services
-│   ├── database.py     # SQLite persistence script for tracking user records
-│   └── gemini.py       # Google Gemini API connector & model prompt engine
-├── config.py            # Environment configuration settings & default fallbacks
-├── main.py              # Master application runner & aiohttp health check server
-├── requirements.txt     # Python dependencies
-└── README.md            # Project documentation
-
----
-
 ## ⚙️ Environment Variables
 
 Configure these keys in your local .env file or hosting service dashboard:
@@ -52,6 +31,7 @@ Configure these keys in your local .env file or hosting service dashboard:
 | BOT_TOKEN | Telegram Bot API token from @BotFather | Yes |
 | GEMINI_API_KEY | Google AI Studio API key | Yes |
 | ADMIN_ID | Your numeric Telegram user ID for admin commands | Yes |
+| DB_PATH | Your MangoDB Url | Yes |
 | LOG_CHANNEL_ID | Numeric ID of your private channel for real-time join alerts | Optional |
 | PORT | Port for the aiohttp health server (Default: 10000) | Optional |
 
@@ -71,26 +51,31 @@ The bot includes built-in controls accessible only to the specified ADMIN_ID:
 ## 💻 Local Setup & Execution
 
 1. Clone the repository:
+```
    git clone https://github.com/MrBoss002/Nova-V2.git
    cd Nova-V2
-
-2. Create and activate a virtual environment:
+```
+3. Create and activate a virtual environment:
+ ```
    python -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-3. Install dependencies:
+```
+4. Install dependencies:
+ ```
    pip install -r requirements.txt
-
-4. Set up .env file:
-   BOT_TOKEN=1234567890:ABCdefGHIjklMNOpqrsTUVwxyZ
-   GEMINI_API_KEY=AIzaSyYourGeminiApiKeyHere
-   ADMIN_ID=123456789
-   LOG_CHANNEL_ID=-1001234567890
-   PORT=10000
-
-5. Launch the bot:
+```
+5. Set up .env file:
+```
+BOT_TOKEN=1234567890:ABCdefGHIjklMNOpqrsTUVwxyZ
+GEMINI_API_KEY=AIzaSyYourGeminiApiKeyHere
+ADMIN_ID=123456789
+LOG_CHANNEL_ID=-1001234567890
+PORT=10000
+```
+7. Launch the bot:
+```
    python main.py
-
+```
 ---
 
 ## ☁️ Deploy to Render
@@ -101,10 +86,10 @@ Deploy Nova-V2 to Render for 24/7 web hosting:
 
 ### Render Deployment Steps:
 1. Click the Deploy to Render button above or connect your MrBoss002/Nova-V2 repository manually.
-2. Set Environment to Python 3.
-3. Set Build Command: pip install -r requirements.txt
-4. Set Start Command: python main.py
-5. Add your Environment Variables (BOT_TOKEN, GEMINI_API_KEY, ADMIN_ID, PORT=10000) under the Environment tab.
+2. Set Environment to `Python 3`.
+3. Set Build Command: `pip install -r requirements.txt`
+4. Set Start Command: `python main.py`
+5. Add your Environment Variables (`BOT_TOKEN`, `GEMINI_API_KEY`, `DB_PATH`, `ADMIN_ID`, `PORT=10000`) under the Environment tab.
 6. Save and deploy!
 
 ---
@@ -113,9 +98,9 @@ Deploy Nova-V2 to Render for 24/7 web hosting:
 
 Need help with setup, technical support, or video tutorials? Connect below:
 
-* 👤 **Developer / Technical Contact:** [https://t.me/MrBoss002](https://t.me/MrBoss002)
-* 📢 **Official Telegram Channel:** [https://t.me/ZeroTwo_OnlineStore](https://t.me/ZeroTwo_OnlineStore)
-* 🎥 **YouTube Video Tutorials:** [https://youtube.com](https://youtube.com)
+* 👤 **Developer / Technical Contact:** [@MrBoss002](https://t.me/MrBoss002)
+* 📢 **Official Telegram Channel:** [@MrBossTG](https://t.me/MrBossTG)
+* 🎥 **YouTube Video Tutorials:** [@MrBoss002](https://youtube.com/@MrBoss002)
 
 ---
 
