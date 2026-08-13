@@ -3,7 +3,7 @@ from google import genai
 from google.genai import types
 from config import GEMINI_API_KEY, OWNER_HANDLE, MAIN_CHANNEL
 
-# Initialize the new Google GenAI client
+# Initialize the Google GenAI client
 client = genai.Client(api_key=GEMINI_API_KEY)
 
 SYSTEM_PROMPT = f"""
@@ -29,7 +29,7 @@ KEY INSTRUCTIONS:
 """
 
 async def generate_response(prompt: str, image_bytes: bytes = None) -> str:
-    """Generates responses using the updated google-genai SDK."""
+    """Generates responses using the stable gemini-1.5-flash model."""
     try:
         config = types.GenerateContentConfig(
             system_instruction=SYSTEM_PROMPT
@@ -43,10 +43,10 @@ async def generate_response(prompt: str, image_bytes: bytes = None) -> str:
         else:
             contents = prompt
 
-        # Offload blocking request to background thread
+        # Execute API call in a background thread to keep aiogram non-blocking
         response = await asyncio.to_thread(
             client.models.generate_content,
-            model="gemini-2.5-flash",
+            model="gemini-1.5-flash",
             contents=contents,
             config=config
         )
