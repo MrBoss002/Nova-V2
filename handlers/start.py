@@ -1,6 +1,6 @@
 import logging
-from aiogram import Router, types
-from aiogram.filters import CommandStart
+from aiogram import Router, F, types
+from aiogram.filters import CommandStart, Command
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from config import OWNER_HANDLE, MAIN_CHANNEL, STORE_CATALOG, LOG_CHANNEL_ID
 from services.database import add_user
@@ -46,7 +46,7 @@ async def cmd_start(message: types.Message):
         except Exception as e:
             logging.error(f"Failed to send log alert: {e}")
 
-    # 3. Welcome text converted to standard HTML (no unescaped character crashes)
+    # 3. Clean HTML welcome message
     welcome_text = (
         "✨ <b>Welcome to Nova — Your All-in-One AI Assistant & Business Hub!</b>\n\n"
         "Hey there! 👋 I'm Nova, your personal AI assistant, content strategist, and dynamic companion. "
@@ -63,4 +63,35 @@ async def cmd_start(message: types.Message):
     try:
         await message.answer(welcome_text, parse_mode="HTML", reply_markup=get_start_keyboard())
     except Exception as e:
-        logging.error(f"Failed to send start message to user: {e}")
+        logging.error(f"Failed to send welcome message: {e}")
+
+# ==========================================
+# CALLBACK QUERY HANDLERS FOR INLINE BUTTONS
+# ==========================================
+
+@router.callback_query(F.data == "mode_business")
+async def mode_business_handler(callback: types.CallbackQuery):
+    await callback.answer()  # Stops the button loading animation
+    await callback.message.answer(
+        "💼 <b>Business Assistant Mode Activated!</b>\n\n"
+        "Send me your e-commerce product info, marketing strategy questions, or business ideas to get started.",
+        parse_mode="HTML"
+    )
+
+@router.callback_query(F.data == "mode_creator")
+async def mode_creator_handler(callback: types.CallbackQuery):
+    await callback.answer()
+    await callback.message.answer(
+        "✍️ <b>Post Formatter Mode Activated!</b>\n\n"
+        "Send me raw text or post drafts. I'll format it with native Telegram headers (#, ##, ###), bold highlights, and clean spacing.",
+        parse_mode="HTML"
+    )
+
+@router.callback_query(F.data == "mode_friend")
+async def mode_friend_handler(callback: types.CallbackQuery):
+    await callback.answer()
+    await callback.message.answer(
+        "💬 <b>Casual Chat Mode Activated!</b>\n\n"
+        "Feel free to ask me anything or chat about any topic you like!",
+        parse_mode="HTML"
+    )
